@@ -122,24 +122,22 @@ class Deck:
 #define event handlers for buttons
 def deal():
     global outcome, in_play, player, dealer, deck, score
-
-    # your code goes here
-    player = Hand()
-    dealer = Hand()
-    deck = Deck()
     
-    deck.shuffle()
-    d = deck.deal_card()
-    player.add_card(d)
-    dealer.add_card(d)
-    
-    if in_play:
+    if in_play == False:
+        deck = Deck()
+        player = Hand()
+        dealer = Hand()
+        deck.shuffle()
+        for i in range(2):
+            dealer.add_card(deck.deal_card())
+            player.add_card(deck.deal_card())
+        dealer.cardList[0].hidden = True
+        outcome = "Hit or Stand?"
+        in_play = True
+    else:
         outcome = "Restared the game!"
         score -= 1
-    else:
-        outcome = "New Game!"
-    
-    in_play = True
+        in_play = False 
 
 def hit():
     # replace with your code below
@@ -149,7 +147,7 @@ def hit():
     if in_play:
         player.add_card(deck.deal_card())
         if player.get_value() > 21:
-            outcome = "You have Busted!!!"
+            outcome = "You have Busted!"
             in_play = False
             score -= 1
         
@@ -161,21 +159,21 @@ def stand():
     if not in_play: return 
     
     if player.get_value() > 21:
-        outcome = "You have Busted!!!"
+        outcome = "You have Busted!"
         score -= 1
     else:
         while dealer.get_value() < 17:
             d = deck.deal_card()
             dealer.add_card(d)
     if dealer.get_value() > 21:
-        outcome = "Dealer have busted! ...New Game!"
+        outcome = "Dealer has busted! New Game?"
         score += 1
     else: 
         if player.get_value() > dealer.get_value():
-            outcome = "You Win!! ...New Game!?"
+            outcome = "You Win! New Game!?"
             score += 1
         else: 
-            outcome = "You Loose!! ...New Game!"
+            outcome = "You Lose! New Game?"
             score -= 1
   
     # assign a message to outcome, update in_play and score
@@ -185,25 +183,30 @@ def stand():
 def draw(canvas):
     # test to make sure that card.draw works, replace with your code below
     canvas.draw_text("Black Jack", [220, 100], 36, "Black")
-    canvas.draw_text(outcome, [0, 200], 26, "Black")
-    canvas.draw_text("Score: " + str(score), [255,150], 26, "Black")
-    
-    dealer.draw(canvas, [0, 250])
-    player.draw(canvas, [0, 350])
-    
+    canvas.draw_text(str(outcome), [0, 200], 30, "Black")
+    canvas.draw_text("Score: " + str(score), [255,150], 30, "Black")
+    canvas.draw_text("Player", (8, 390), 30, "Black")
+    canvas.draw_text("Dealer", (8, 290), 30, "Black")
+    dealer.draw(canvas, [100, 250])
+    player.draw(canvas, [100, 350])
+    player.draw(canvas, [100, 350])
+
+
+
     if in_play:
-        canvas.draw_image(card_back, CARD_BACK_CENTER, CARD_BACK_SIZE, [74 + CARD_BACK_CENTER[0], 250 + CARD_BACK_CENTER[1]], CARD_SIZE)  
+        canvas.draw_image(card_back, CARD_BACK_CENTER, CARD_BACK_SIZE, [174 + CARD_BACK_CENTER[0], 250 + CARD_BACK_CENTER[1]], CARD_SIZE)  
 
 
 # initialization frame
 frame = simplegui.create_frame("Blackjack", 600, 600)
-frame.set_canvas_background("Red")
+frame.set_canvas_background("Green")
 
 #create buttons and canvas callback
 frame.add_button("Deal", deal, 200)
 frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
 frame.set_draw_handler(draw)
+
 
 
 # get things rolling
